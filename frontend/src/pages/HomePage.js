@@ -134,18 +134,18 @@ export const HomePage = () => {
       </section>
 
       {/* Featured Products - Bento Grid */}
-      <section className="py-12 md:py-20 px-4 md:px-8" data-testid="featured-products-section">
+      <section className="py-16 md:py-24 px-4 md:px-8 bg-gray-50" data-testid="featured-products-section">
         <div className="max-w-[1400px] mx-auto">
-          <div className="mb-12">
-            <h2 className="text-4xl md:text-6xl font-syne font-bold tracking-tight mb-4">
-              FEATURED FINDS
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-display font-bold mb-4 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent">
+              Featured Collection
             </h2>
-            <p className="text-lg font-manrope text-gray-600">Handpicked just for you</p>
+            <p className="text-lg text-gray-600">Handpicked products just for you</p>
           </div>
 
           {loading ? (
             <div className="text-center py-12" data-testid="loading-products">
-              <div className="animate-pulse text-gray-500 font-manrope">Loading amazing products...</div>
+              <div className="animate-pulse text-gray-500">Loading amazing products...</div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="products-grid">
@@ -155,34 +155,34 @@ export const HomePage = () => {
                   <Link
                     key={product.id}
                     to={`/product/${product.id}`}
-                    className="border-2 border-black bg-white hover:shadow-brutalist-lg transition-all duration-300 group overflow-hidden"
+                    className="group bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-large transition-all duration-300 hover:scale-[1.02]"
                     data-testid={`product-card-${product.id}`}
                   >
-                    <div className="aspect-square overflow-hidden border-b-2 border-black">
+                    <div className="aspect-square overflow-hidden relative">
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         data-testid={`product-image-${product.id}`}
                       />
+                      {product.discount > 0 && (
+                        <div className="absolute top-3 right-3 bg-gradient-to-r from-zenvy-accent to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold" data-testid={`product-discount-${product.id}`}>
+                          {product.discount}% OFF
+                        </div>
+                      )}
                     </div>
                     <div className="p-4">
-                      <h3 className="font-bold font-manrope text-lg mb-2 line-clamp-2" data-testid={`product-name-${product.id}`}>
+                      <h3 className="font-semibold text-gray-900 text-base mb-2 line-clamp-2" data-testid={`product-name-${product.id}`}>
                         {product.name}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold font-mono" data-testid={`product-price-${product.id}`}>
+                        <span className="text-xl font-bold text-zenvy-primary" data-testid={`product-price-${product.id}`}>
                           ₹{finalPrice.toFixed(2)}
                         </span>
                         {product.discount > 0 && (
-                          <>
-                            <span className="text-sm text-gray-500 line-through" data-testid={`product-original-price-${product.id}`}>
-                              ₹{product.price.toFixed(2)}
-                            </span>
-                            <span className="bg-brutalist-accent text-white px-2 py-1 text-xs font-bold" data-testid={`product-discount-${product.id}`}>
-                              {product.discount}% OFF
-                            </span>
-                          </>
+                          <span className="text-sm text-gray-400 line-through" data-testid={`product-original-price-${product.id}`}>
+                            ₹{product.price.toFixed(2)}
+                          </span>
                         )}
                       </div>
                     </div>
