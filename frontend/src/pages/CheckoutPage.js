@@ -163,57 +163,61 @@ export const CheckoutPage = () => {
                     onChange={handleInputChange}
                     required
                     pattern="[0-9]{10}"
-                    className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                     data-testid="customer-phone-input"
+                    placeholder="10-digit mobile number"
                   />
                 </div>
               </div>
             </div>
 
             {/* Shipping Address */}
-            <div className="bg-white border-2 border-black p-6">
-              <h2 className="font-syne font-bold text-xl mb-4">SHIPPING ADDRESS</h2>
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft">
+              <h2 className="font-display font-bold text-xl mb-6 text-gray-900">Shipping Address</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-mono uppercase mb-2">Address *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Address *</label>
                   <textarea
                     name="shipping_address"
                     value={formData.shipping_address}
                     onChange={handleInputChange}
                     required
                     rows="3"
-                    className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                     data-testid="shipping-address-input"
+                    placeholder="House no, Street, Landmark"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-mono uppercase mb-2">City *</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">City *</label>
                     <input
                       type="text"
                       name="shipping_city"
                       value={formData.shipping_city}
                       onChange={handleInputChange}
                       required
-                      className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                      className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                       data-testid="shipping-city-input"
+                      placeholder="City"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-mono uppercase mb-2">State *</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">State *</label>
                     <input
                       type="text"
                       name="shipping_state"
                       value={formData.shipping_state}
                       onChange={handleInputChange}
                       required
-                      className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                      className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                       data-testid="shipping-state-input"
+                      placeholder="State"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-mono uppercase mb-2">Pincode *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Pincode *</label>
                   <input
                     type="text"
                     name="shipping_pincode"
@@ -221,8 +225,9 @@ export const CheckoutPage = () => {
                     onChange={handleInputChange}
                     required
                     pattern="[0-9]{6}"
-                    className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                     data-testid="shipping-pincode-input"
+                    placeholder="6-digit pincode"
                   />
                 </div>
               </div>
@@ -231,10 +236,10 @@ export const CheckoutPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brutalist-primary text-white font-bold py-4 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-4 px-8 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-lg"
               data-testid="place-order-btn"
             >
-              {loading ? 'PROCESSING...' : 'PROCEED TO PAYMENT'}
+              {loading ? 'Processing...' : 'Proceed to Payment'}
             </button>
           </form>
 
