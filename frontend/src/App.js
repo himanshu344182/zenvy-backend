@@ -14,6 +14,7 @@ import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
+import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage';
 
 function App() {
   return (
