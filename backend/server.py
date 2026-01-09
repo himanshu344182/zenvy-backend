@@ -444,6 +444,87 @@ async def admin_get_stats(username: str = Depends(verify_token)):
         "total_revenue": total_revenue
     }
 
+@api_router.post("/admin/shiprocket/create-order")
+async def create_shiprocket_order(order_id: str, username: str = Depends(verify_token)):
+    if not SHIPROCKET_EMAIL or not SHIPROCKET_PASSWORD:
+        raise HTTPException(status_code=400, detail="Shiprocket not configured")
+    
+    # Get order details
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    try:
+        # Get Shiprocket auth token
+        auth_response = requests.post(
+            "https://apiv2.shiprocket.in/v1/external/auth/login",
+            json={"email": SHIPROCKET_EMAIL, "password": SHIPROCKET_PASSWORD}
+        )
+        auth_data = auth_response.json()
+        token = auth_data.get('token')
+        
+        if not token:
+            raise HTTPException(status_code=500, detail="Shiprocket authentication failed")
+        
+        # Create shipment
+        shipment_data = {
+            "order_id": order['order_number'],
+            "order_date": order['created_at'],
+            "pickup_location": "Primary",
+            "billing_customer_name": order['customer_name'],
+            "billing_address": order['shipping_address'],
+            "billing_city": order['shipping_city'],
+            "billing_pincode": order['shipping_pincode'],
+            "billing_state": order['shipping_state'],
+            "billing_country": "India",
+            "billing_email": order['customer_email'],
+            "billing_phone": order['customer_phone'],
+            "shipping_is_billing": True,
+            "order_items": [
+                {
+                    "name": item['product_name'],
+                    "sku": item['product_id'],
+                    "units": item['quantity'],
+                    "selling_price": item['price']
+                }
+                for item in order['items']
+            ],
+            "payment_method": "Prepaid",
+            "sub_total": order['subtotal'],
+            "length": 10,
+            "breadth": 10,
+            "height": 10,
+            "weight": 0.5
+        }
+        
+        shipment_response = requests.post(
+            "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
+            headers={"Authorization": f"Bearer {token}"},
+            json=shipment_data
+        )
+        
+        shipment_result = shipment_response.json()
+        
+        if shipment_response.status_code == 200:
+            # Update order with shiprocket details
+            await db.orders.update_one(
+                {"id": order_id},
+                {
+                    "$set": {
+                        "shiprocket_order_id": shipment_result.get('order_id'),
+                        "tracking_id": shipment_result.get('shipment_id'),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            return {"message": "Shiprocket order created", "data": shipment_result}
+        else:
+            raise HTTPException(status_code=500, detail=shipment_result.get('message', 'Shiprocket order creation failed'))
+            
+    except Exception as e:
+        logging.error(f"Shiprocket error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 app.include_router(api_router)
 
 app.add_middleware(
