@@ -54,80 +54,80 @@ export const HomePage = () => {
             </div>
 
             {/* Right: Hero Image */}
-            <div className="relative overflow-hidden">
+            <div className="relative overflow-hidden h-full">
               <img
                 src="https://images.pexels.com/photos/6567607/pexels-photo-6567607.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Happy shoppers"
                 className="w-full h-full object-cover"
                 data-testid="hero-image"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-zenvy-primary/20 to-transparent" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Marquee */}
-      <section className="border-b-2 border-black bg-brutalist-secondary overflow-hidden" data-testid="marquee-section">
-        <div className="flex whitespace-nowrap py-4">
-          <div className="animate-marquee flex items-center gap-8 text-2xl font-syne font-bold">
+      <section className="bg-gradient-to-r from-zenvy-primary to-zenvy-secondary overflow-hidden py-4" data-testid="marquee-section">
+        <div className="flex whitespace-nowrap">
+          <div className="animate-marquee flex items-center gap-8 text-xl font-display font-semibold text-white">
             <span className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6" />
-              TRENDING
+              <Sparkles className="w-5 h-5" />
+              Trending
             </span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              HOT
+              <TrendingUp className="w-5 h-5" />
+              Hot Deals
             </span>
             <span>•</span>
-            <span>NEW</span>
+            <span>New Arrivals</span>
             <span>•</span>
-            <span>VIBES</span>
+            <span>Top Rated</span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6" />
-              TRENDING
+              <Sparkles className="w-5 h-5" />
+              Trending
             </span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              HOT
+              <TrendingUp className="w-5 h-5" />
+              Hot Deals
             </span>
             <span>•</span>
-            <span>NEW</span>
+            <span>New Arrivals</span>
             <span>•</span>
-            <span>VIBES</span>
+            <span>Top Rated</span>
             <span>•</span>
           </div>
-          <div className="animate-marquee flex items-center gap-8 text-2xl font-syne font-bold">
+          <div className="animate-marquee flex items-center gap-8 text-xl font-display font-semibold text-white">
             <span className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6" />
-              TRENDING
+              <Sparkles className="w-5 h-5" />
+              Trending
             </span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              HOT
+              <TrendingUp className="w-5 h-5" />
+              Hot Deals
             </span>
             <span>•</span>
-            <span>NEW</span>
+            <span>New Arrivals</span>
             <span>•</span>
-            <span>VIBES</span>
+            <span>Top Rated</span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6" />
-              TRENDING
+              <Sparkles className="w-5 h-5" />
+              Trending
             </span>
             <span>•</span>
             <span className="flex items-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              HOT
+              <TrendingUp className="w-5 h-5" />
+              Hot Deals
             </span>
             <span>•</span>
-            <span>NEW</span>
+            <span>New Arrivals</span>
             <span>•</span>
-            <span>VIBES</span>
+            <span>Top Rated</span>
             <span>•</span>
           </div>
         </div>
