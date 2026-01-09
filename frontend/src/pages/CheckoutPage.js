@@ -7,7 +7,7 @@ import { useRazorpay } from 'react-razorpay';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const [Razorpay] = useRazorpay();
+  const Razorpay = useRazorpay();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
   
