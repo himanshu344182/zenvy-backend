@@ -350,11 +350,25 @@ async def create_admin(admin_data: AdminCreate):
     return {"message": "Admin created successfully"}
 
 @api_router.post("/admin/change-password")
+@limiter.limit("3/minute")
 async def change_password(
+    request: Request,
     old_password: str = Form(...),
     new_password: str = Form(...),
     username: str = Depends(verify_token)
 ):
+    # Validate new password
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    if not re.search(r'[a-z]', new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one lowercase letter")
+    if not re.search(r'[A-Z]', new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter")
+    if not re.search(r'\d', new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one digit")
+    if not re.search(r'[@$!%*?&]', new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one special character (@$!%*?&)")
+    
     admin = await db.admins.find_one({"username": username}, {"_id": 0})
     if not admin:
         raise HTTPException(status_code=404, detail="Admin not found")
