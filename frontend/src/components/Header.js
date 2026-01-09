@@ -19,21 +19,21 @@ export const Header = () => {
 
   return (
     <>
-      <header className="border-b-2 border-black bg-white sticky top-0 z-30" data-testid="main-header">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30 shadow-soft" data-testid="main-header">
         <div className="max-w-[1400px] mx-auto">
           {/* Top bar */}
-          <div className="border-b-2 border-black py-2 px-4">
+          <div className="border-b border-gray-100 py-2 px-4 bg-gradient-to-r from-zenvy-primary/5 to-zenvy-secondary/5">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-mono uppercase tracking-widest">
-                FREE SHIPPING ON ORDERS OVER ₹999
+              <div className="text-xs font-medium text-gray-600">
+                ✨ Free shipping on orders over ₹999
               </div>
               <Link 
                 to="/admin" 
-                className="text-xs font-mono uppercase tracking-widest hover:text-brutalist-primary transition-colors"
+                className="text-xs font-medium text-gray-600 hover:text-zenvy-primary transition-colors flex items-center gap-1"
                 data-testid="admin-link"
               >
-                <User className="w-4 h-4 inline mr-1" />
-                ADMIN
+                <User className="w-3.5 h-3.5" />
+                Admin
               </Link>
             </div>
           </div>
@@ -42,9 +42,9 @@ export const Header = () => {
           <div className="p-4 md:p-6">
             <div className="flex items-center justify-between gap-4">
               {/* Logo */}
-              <Link to="/" data-testid="home-link">
-                <h1 className="text-3xl md:text-4xl font-syne font-bold tracking-tighter">
-                  EVERYTHING<span className="text-brutalist-primary">.</span>
+              <Link to="/" data-testid="home-link" className="group">
+                <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+                  ZENVY
                 </h1>
               </Link>
 
