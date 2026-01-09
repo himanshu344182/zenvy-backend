@@ -16,6 +16,7 @@ import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { ProtectedAdminRoute } from './components/ProtectedAdminRoute';
 
 function App() {
   return (
