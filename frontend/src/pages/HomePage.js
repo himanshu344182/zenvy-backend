@@ -30,9 +30,6 @@ export const HomePage = () => {
         keywords="online shopping India, ecommerce, buy electronics online, fashion store, home decor, daily essentials, trendy products, ZENVY store"
         url="https://webstore-tracker.preview.emergentagent.com"
       />
-
-  return (
-    <div data-testid="home-page">
       {/* Hero Section */}
       <section className="relative overflow-hidden" data-testid="hero-section">
         <div className="absolute inset-0 bg-gradient-to-br from-zenvy-primary/10 via-zenvy-secondary/10 to-transparent"></div>
