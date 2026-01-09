@@ -28,54 +28,56 @@ export const AdminLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" data-testid="admin-login-page">
+    <div className="min-h-screen bg-gradient-to-br from-zenvy-primary/10 via-zenvy-secondary/10 to-white flex items-center justify-center p-4" data-testid="admin-login-page">
       <div className="w-full max-w-md">
-        <div className="bg-white border-2 border-black p-8">
-          <div className="flex items-center justify-center w-16 h-16 bg-brutalist-primary border-2 border-black mx-auto mb-6">
+        <div className="bg-white rounded-2xl shadow-large p-8">
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary rounded-2xl mx-auto mb-6">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-syne font-bold text-center mb-2" data-testid="admin-login-title">
-            ADMIN LOGIN
+          <h1 className="text-3xl font-display font-bold text-center mb-2 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent" data-testid="admin-login-title">
+            Admin Login
           </h1>
-          <p className="text-center text-gray-600 font-manrope mb-6">Access your admin dashboard</p>
+          <p className="text-center text-gray-600 mb-8">Access your ZENVY dashboard</p>
 
-          <form onSubmit={handleLogin} className="space-y-4" data-testid="admin-login-form">
+          <form onSubmit={handleLogin} className="space-y-5" data-testid="admin-login-form">
             <div>
-              <label className="block text-sm font-mono uppercase mb-2">Username</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                 data-testid="admin-username-input"
+                placeholder="Enter username"
               />
             </div>
             <div>
-              <label className="block text-sm font-mono uppercase mb-2">Password</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                 data-testid="admin-password-input"
+                placeholder="Enter password"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brutalist-primary text-white font-bold py-3 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-3.5 px-8 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
               data-testid="admin-login-btn"
             >
-              {loading ? 'LOGGING IN...' : 'LOGIN'}
+              {loading ? 'Logging in...' : 'Login to Dashboard'}
             </button>
           </form>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 font-manrope">
-            Default credentials: admin / admin123
+        <div className="mt-6 text-center bg-white/60 backdrop-blur rounded-xl p-4">
+          <p className="text-sm text-gray-600">
+            Default: <span className="font-semibold text-gray-900">admin / admin123</span>
           </p>
         </div>
       </div>
