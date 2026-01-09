@@ -5,14 +5,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brutalist: {
-          bg: '#FFFFFF',
-          fg: '#000000',
-          primary: '#0047FF',
-          secondary: '#CCFF00',
-          accent: '#FF4D00',
-          muted: '#F3F4F6',
-          border: '#000000'
+        zenvy: {
+          primary: '#6366F1', // Modern indigo
+          secondary: '#8B5CF6', // Purple
+          accent: '#EC4899', // Pink
+          dark: '#1F2937', // Dark gray
+          light: '#F9FAFB', // Light gray
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -49,22 +47,18 @@ module.exports = {
         },
       },
       fontFamily: {
-        syne: ['Syne', 'sans-serif'],
-        manrope: ['Manrope', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace']
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'sans-serif'],
       },
       boxShadow: {
-        'brutalist': '4px 4px 0px 0px rgba(0,0,0,1)',
-        'brutalist-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        'medium': '0 4px 25px -3px rgba(0, 0, 0, 0.1), 0 12px 30px -2px rgba(0, 0, 0, 0.05)',
+        'large': '0 10px 40px -3px rgba(0, 0, 0, 0.15), 0 20px 50px -2px rgba(0, 0, 0, 0.1)',
       },
-      animation: {
-        'marquee': 'marquee 20s linear infinite',
-      },
-      keyframes: {
-        marquee: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-100%)' },
-        },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
       },
     },
   },
