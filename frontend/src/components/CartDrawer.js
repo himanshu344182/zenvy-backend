@@ -35,23 +35,23 @@ export const CartDrawer = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50">
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50" 
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm" 
         onClick={onClose}
         data-testid="cart-overlay"
       />
       <div 
-        className="absolute right-0 top-0 h-full w-full md:w-[500px] bg-white border-l-2 border-black flex flex-col"
+        className="absolute right-0 top-0 h-full w-full md:w-[420px] bg-white shadow-large flex flex-col"
         data-testid="cart-drawer"
       >
         {/* Header */}
-        <div className="p-6 border-b-2 border-black flex items-center justify-between">
-          <h2 className="text-2xl font-syne font-bold" data-testid="cart-title">YOUR CART</h2>
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-zenvy-primary/5 to-zenvy-secondary/5">
+          <h2 className="text-2xl font-display font-bold text-gray-900" data-testid="cart-title">Your Cart</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             data-testid="cart-close-btn"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
