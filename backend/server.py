@@ -300,6 +300,13 @@ async def verify_payment(payment_data: PaymentVerification):
                     {"id": item['product_id']},
                     {"$inc": {"stock": -item['quantity']}}
                 )
+            
+            # Auto-create Shiprocket shipment if configured
+            if SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD:
+                try:
+                    await create_shiprocket_shipment_internal(order)
+                except Exception as e:
+                    logging.error(f"Auto-shipment creation failed: {e}")
         
         return {"status": "success", "message": "Payment verified"}
     except Exception as e:
