@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { SlidersHorizontal } from 'lucide-react';
 import api from '../utils/api';
+import { SEO } from '../components/SEO';
 
 export const ProductsPage = () => {
   const [searchParams] = useSearchParams();
