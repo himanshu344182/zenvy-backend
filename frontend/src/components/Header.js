@@ -95,15 +95,15 @@ export const Header = () => {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border-2 border-black bg-white p-3 pr-12 text-base focus:ring-0 focus:outline-none focus:shadow-brutalist transition-all"
+                  className="w-full border border-gray-300 bg-white rounded-full px-5 py-3 pr-12 text-sm focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all shadow-soft"
                   data-testid="search-input-mobile"
                 />
                 <button
                   type="submit"
-                  className="absolute right-0 top-0 h-full px-4 border-l-2 border-black hover:bg-black hover:text-white transition-colors"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-zenvy-primary hover:bg-zenvy-secondary text-white transition-colors flex items-center justify-center"
                   data-testid="search-btn-mobile"
                 >
-                  <Search className="w-5 h-5" />
+                  <Search className="w-4 h-4" />
                 </button>
               </div>
             </form>
