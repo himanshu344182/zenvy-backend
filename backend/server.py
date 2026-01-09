@@ -1,15 +1,20 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File, Form
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import jwt
+import bcrypt
+import razorpay
+import requests
+from decimal import Decimal
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,54 +24,405 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
+# JWT Configuration
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440
+
+# Razorpay Configuration (will be set by user later)
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
+
+# Shiprocket Configuration (will be set by user later)
+SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL', '')
+SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
+
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+security = HTTPBearer()
 
+# ============ MODELS ============
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+class Product(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    name: str
+    description: str
+    price: float
+    discount: float = 0
+    stock: int
+    images: List[str]
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class ProductCreate(BaseModel):
+    name: str
+    description: str
+    price: float
+    discount: float = 0
+    stock: int
+    images: List[str]
 
-# Add your routes to the router instead of directly to app
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    discount: Optional[float] = None
+    stock: Optional[int] = None
+    images: Optional[List[str]] = None
+
+class OrderItem(BaseModel):
+    product_id: str
+    product_name: str
+    price: float
+    quantity: int
+    image: str
+
+class Order(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_number: str = Field(default_factory=lambda: f"ORD-{uuid.uuid4().hex[:8].upper()}")
+    customer_name: str
+    customer_email: EmailStr
+    customer_phone: str
+    shipping_address: str
+    shipping_city: str
+    shipping_state: str
+    shipping_pincode: str
+    items: List[OrderItem]
+    subtotal: float
+    shipping_cost: float = 0
+    total: float
+    payment_id: Optional[str] = None
+    razorpay_order_id: Optional[str] = None
+    razorpay_payment_id: Optional[str] = None
+    razorpay_signature: Optional[str] = None
+    payment_status: str = "pending"  # pending, paid, failed
+    order_status: str = "pending"  # pending, confirmed, packed, shipped, delivered, cancelled
+    tracking_id: Optional[str] = None
+    shiprocket_order_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class OrderCreate(BaseModel):
+    customer_name: str
+    customer_email: EmailStr
+    customer_phone: str
+    shipping_address: str
+    shipping_city: str
+    shipping_state: str
+    shipping_pincode: str
+    items: List[OrderItem]
+    subtotal: float
+    total: float
+
+class OrderStatusUpdate(BaseModel):
+    order_status: str
+    tracking_id: Optional[str] = None
+
+class PaymentVerification(BaseModel):
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+
+class Admin(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    username: str
+    password_hash: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AdminLogin(BaseModel):
+    username: str
+    password: str
+
+class AdminCreate(BaseModel):
+    username: str
+    password: str
+
+# ============ HELPER FUNCTIONS ============
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        return username
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+# ============ PUBLIC ROUTES ============
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "E-Commerce API", "status": "active"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+# Product Routes
+@api_router.get("/products", response_model=List[Product])
+async def get_products(
+    search: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    limit: int = 100
+):
+    query = {}
+    if search:
+        query["name"] = {"$regex": search, "$options": "i"}
+    if min_price is not None or max_price is not None:
+        query["price"] = {}
+        if min_price is not None:
+            query["price"]["$gte"] = min_price
+        if max_price is not None:
+            query["price"]["$lte"] = max_price
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+    products = await db.products.find(query, {"_id": 0}).limit(limit).to_list(limit)
+    for product in products:
+        if isinstance(product.get('created_at'), str):
+            product['created_at'] = datetime.fromisoformat(product['created_at'])
+        if isinstance(product.get('updated_at'), str):
+            product['updated_at'] = datetime.fromisoformat(product['updated_at'])
+    return products
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/products/{product_id}", response_model=Product)
+async def get_product(product_id: str):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if isinstance(product.get('created_at'), str):
+        product['created_at'] = datetime.fromisoformat(product['created_at'])
+    if isinstance(product.get('updated_at'), str):
+        product['updated_at'] = datetime.fromisoformat(product['updated_at'])
+    return product
 
-# Include the router in the main app
+# Order Routes
+@api_router.post("/orders", response_model=Order)
+async def create_order(order_data: OrderCreate):
+    order = Order(**order_data.model_dump())
+    
+    # Create Razorpay order if keys are configured
+    if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET:
+        try:
+            razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+            amount_in_paise = int(order.total * 100)
+            razorpay_order = razorpay_client.order.create({
+                "amount": amount_in_paise,
+                "currency": "INR",
+                "receipt": order.order_number,
+                "payment_capture": 1
+            })
+            order.razorpay_order_id = razorpay_order['id']
+        except Exception as e:
+            logging.error(f"Razorpay order creation failed: {e}")
+    
+    doc = order.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    await db.orders.insert_one(doc)
+    return order
+
+@api_router.post("/orders/verify-payment")
+async def verify_payment(payment_data: PaymentVerification):
+    if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
+        raise HTTPException(status_code=400, detail="Razorpay not configured")
+    
+    try:
+        razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+        razorpay_client.utility.verify_payment_signature({
+            'razorpay_order_id': payment_data.razorpay_order_id,
+            'razorpay_payment_id': payment_data.razorpay_payment_id,
+            'razorpay_signature': payment_data.razorpay_signature
+        })
+        
+        # Update order
+        await db.orders.update_one(
+            {"razorpay_order_id": payment_data.razorpay_order_id},
+            {
+                "$set": {
+                    "payment_status": "paid",
+                    "order_status": "confirmed",
+                    "razorpay_payment_id": payment_data.razorpay_payment_id,
+                    "razorpay_signature": payment_data.razorpay_signature,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Reduce stock for each item
+        order = await db.orders.find_one({"razorpay_order_id": payment_data.razorpay_order_id}, {"_id": 0})
+        if order:
+            for item in order['items']:
+                await db.products.update_one(
+                    {"id": item['product_id']},
+                    {"$inc": {"stock": -item['quantity']}}
+                )
+        
+        return {"status": "success", "message": "Payment verified"}
+    except Exception as e:
+        logging.error(f"Payment verification failed: {e}")
+        raise HTTPException(status_code=400, detail="Payment verification failed")
+
+@api_router.get("/orders/track/{order_number}")
+async def track_order(order_number: str):
+    order = await db.orders.find_one({"order_number": order_number.upper()}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Convert ISO strings to datetime
+    if isinstance(order.get('created_at'), str):
+        order['created_at'] = datetime.fromisoformat(order['created_at'])
+    if isinstance(order.get('updated_at'), str):
+        order['updated_at'] = datetime.fromisoformat(order['updated_at'])
+    
+    return order
+
+# Admin Auth Routes
+@api_router.post("/admin/login")
+async def admin_login(credentials: AdminLogin):
+    admin = await db.admins.find_one({"username": credentials.username}, {"_id": 0})
+    if not admin or not verify_password(credentials.password, admin['password_hash']):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    access_token = create_access_token(data={"sub": admin['username']})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@api_router.post("/admin/create")
+async def create_admin(admin_data: AdminCreate):
+    # Check if admin already exists
+    existing = await db.admins.find_one({"username": admin_data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Admin already exists")
+    
+    admin = Admin(
+        username=admin_data.username,
+        password_hash=hash_password(admin_data.password)
+    )
+    
+    doc = admin.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.admins.insert_one(doc)
+    
+    return {"message": "Admin created successfully"}
+
+# ============ ADMIN ROUTES (Protected) ============
+
+@api_router.get("/admin/products", response_model=List[Product])
+async def admin_get_products(username: str = Depends(verify_token)):
+    products = await db.products.find({}, {"_id": 0}).to_list(1000)
+    for product in products:
+        if isinstance(product.get('created_at'), str):
+            product['created_at'] = datetime.fromisoformat(product['created_at'])
+        if isinstance(product.get('updated_at'), str):
+            product['updated_at'] = datetime.fromisoformat(product['updated_at'])
+    return products
+
+@api_router.post("/admin/products", response_model=Product)
+async def admin_create_product(product_data: ProductCreate, username: str = Depends(verify_token)):
+    product = Product(**product_data.model_dump())
+    doc = product.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    await db.products.insert_one(doc)
+    return product
+
+@api_router.put("/admin/products/{product_id}", response_model=Product)
+async def admin_update_product(product_id: str, product_data: ProductUpdate, username: str = Depends(verify_token)):
+    update_data = {k: v for k, v in product_data.model_dump().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.products.update_one(
+        {"id": product_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if isinstance(product.get('created_at'), str):
+        product['created_at'] = datetime.fromisoformat(product['created_at'])
+    if isinstance(product.get('updated_at'), str):
+        product['updated_at'] = datetime.fromisoformat(product['updated_at'])
+    return product
+
+@api_router.delete("/admin/products/{product_id}")
+async def admin_delete_product(product_id: str, username: str = Depends(verify_token)):
+    result = await db.products.delete_one({"id": product_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product deleted successfully"}
+
+@api_router.get("/admin/orders", response_model=List[Order])
+async def admin_get_orders(username: str = Depends(verify_token)):
+    orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    for order in orders:
+        if isinstance(order.get('created_at'), str):
+            order['created_at'] = datetime.fromisoformat(order['created_at'])
+        if isinstance(order.get('updated_at'), str):
+            order['updated_at'] = datetime.fromisoformat(order['updated_at'])
+    return orders
+
+@api_router.put("/admin/orders/{order_id}")
+async def admin_update_order(order_id: str, status_data: OrderStatusUpdate, username: str = Depends(verify_token)):
+    update_data = {
+        "order_status": status_data.order_status,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    if status_data.tracking_id:
+        update_data["tracking_id"] = status_data.tracking_id
+    
+    result = await db.orders.update_one(
+        {"id": order_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return {"message": "Order updated successfully"}
+
+@api_router.get("/admin/stats")
+async def admin_get_stats(username: str = Depends(verify_token)):
+    total_products = await db.products.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    pending_orders = await db.orders.count_documents({"order_status": "pending"})
+    confirmed_orders = await db.orders.count_documents({"order_status": "confirmed"})
+    
+    # Calculate total revenue from paid orders
+    pipeline = [
+        {"$match": {"payment_status": "paid"}},
+        {"$group": {"_id": None, "total_revenue": {"$sum": "$total"}}}
+    ]
+    revenue_result = await db.orders.aggregate(pipeline).to_list(1)
+    total_revenue = revenue_result[0]['total_revenue'] if revenue_result else 0
+    
+    return {
+        "total_products": total_products,
+        "total_orders": total_orders,
+        "pending_orders": pending_orders,
+        "confirmed_orders": confirmed_orders,
+        "total_revenue": total_revenue
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
@@ -77,7 +433,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
