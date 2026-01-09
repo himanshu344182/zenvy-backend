@@ -37,6 +37,7 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/products" element={<AdminProductsPage />} />
           <Route path="/admin/orders" element={<AdminOrdersPage />} />
+          <Route path="/admin/payments" element={<AdminPaymentsPage />} />
         </Routes>
         
         <Toaster 
