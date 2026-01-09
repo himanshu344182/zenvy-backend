@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCart, getCartTotal, clearCart } from '../utils/cart';
 import api from '../utils/api';
 import { toast } from 'sonner';
-import useRazorpay from 'react-razorpay';
+import { useRazorpay } from 'react-razorpay';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
