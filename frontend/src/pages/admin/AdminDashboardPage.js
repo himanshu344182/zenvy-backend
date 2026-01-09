@@ -116,24 +116,32 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white border-2 border-black p-6" data-testid="quick-actions">
-          <h2 className="font-syne font-bold text-2xl mb-6">QUICK ACTIONS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft" data-testid="quick-actions">
+          <h2 className="font-display font-bold text-2xl mb-6 text-gray-900">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               to="/admin/products"
-              className="flex items-center justify-between bg-brutalist-primary text-white font-bold py-4 px-6 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+              className="group relative overflow-hidden bg-gradient-to-br from-zenvy-primary to-zenvy-secondary text-white font-bold py-5 px-6 rounded-xl shadow-medium hover:shadow-large transition-all hover:scale-[1.02] flex items-center justify-between"
               data-testid="manage-products-btn"
             >
-              <span>MANAGE PRODUCTS</span>
-              <Package className="w-5 h-5" />
+              <span className="text-lg">Manage Products</span>
+              <Package className="w-6 h-6 group-hover:scale-110 transition-transform" />
             </Link>
             <Link
               to="/admin/orders"
-              className="flex items-center justify-between bg-brutalist-secondary text-black font-bold py-4 px-6 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold py-5 px-6 rounded-xl shadow-medium hover:shadow-large transition-all hover:scale-[1.02] flex items-center justify-between"
               data-testid="manage-orders-btn"
             >
-              <span>MANAGE ORDERS</span>
-              <ShoppingBag className="w-5 h-5" />
+              <span className="text-lg">Manage Orders</span>
+              <ShoppingBag className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            </Link>
+            <Link
+              to="/admin/payments"
+              className="group relative overflow-hidden bg-gradient-to-br from-green-500 to-green-600 text-white font-bold py-5 px-6 rounded-xl shadow-medium hover:shadow-large transition-all hover:scale-[1.02] flex items-center justify-between"
+              data-testid="view-payments-btn"
+            >
+              <span className="text-lg">View Payments</span>
+              <DollarSign className="w-6 h-6 group-hover:scale-110 transition-transform" />
             </Link>
           </div>
         </div>
