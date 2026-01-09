@@ -1,0 +1,12 @@
+# ZENVY - E-Commerce Store
+User-agent: *
+Allow: /
+Allow: /products
+Allow: /product/*
+Allow: /track-order
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /checkout
+Disallow: /order-confirmation/*
+
+Sitemap: https://webstore-tracker.preview.emergentagent.com/sitemap.xml
