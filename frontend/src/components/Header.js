@@ -56,15 +56,15 @@ export const Header = () => {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full border-2 border-black bg-white p-3 pr-12 text-base focus:ring-0 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border border-gray-300 bg-white rounded-full px-5 py-3 pr-12 text-sm focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all shadow-soft"
                     data-testid="search-input"
                   />
                   <button
                     type="submit"
-                    className="absolute right-0 top-0 h-full px-4 border-l-2 border-black hover:bg-black hover:text-white transition-colors"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-zenvy-primary hover:bg-zenvy-secondary text-white transition-colors flex items-center justify-center"
                     data-testid="search-btn"
                   >
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4" />
                   </button>
                 </div>
               </form>
@@ -72,13 +72,13 @@ export const Header = () => {
               {/* Cart */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="relative p-3 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                className="relative p-3 rounded-full bg-gray-50 hover:bg-zenvy-primary hover:text-white transition-all shadow-soft"
                 data-testid="cart-icon-btn"
               >
-                <ShoppingCart className="w-6 h-6" />
+                <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
                   <span 
-                    className="absolute -top-2 -right-2 bg-brutalist-secondary text-black w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 border-black"
+                    className="absolute -top-1 -right-1 bg-gradient-to-r from-zenvy-accent to-pink-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
                     data-testid="cart-count-badge"
                   >
                     {cartCount}
