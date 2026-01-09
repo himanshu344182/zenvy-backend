@@ -42,8 +42,17 @@ SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL', '')
 SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
 
 app = FastAPI()
+
+# Rate Limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
+
+# Password validation regex
+PASSWORD_REGEX = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')
 
 # ============ MODELS ============
 
