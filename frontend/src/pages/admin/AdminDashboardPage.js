@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, ShoppingBag, DollarSign, Clock, LogOut } from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, Clock, LogOut, Settings } from 'lucide-react';
 import api from '../../utils/api';
 import { toast } from 'sonner';
 
