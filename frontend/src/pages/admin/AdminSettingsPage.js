@@ -102,10 +102,20 @@ export const AdminSettingsPage = () => {
                   value={passwordForm.new_password}
                   onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
                   required
-                  minLength={6}
+                  minLength={8}
                   className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
-                  placeholder="Enter new password (min 6 characters)"
+                  placeholder="Enter new password"
                 />
+                <div className="mt-2 text-xs text-gray-600 space-y-1">
+                  <p className="font-semibold">Password must contain:</p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter (A-Z)</li>
+                    <li>One lowercase letter (a-z)</li>
+                    <li>One number (0-9)</li>
+                    <li>One special character (@$!%*?&)</li>
+                  </ul>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password *</label>
