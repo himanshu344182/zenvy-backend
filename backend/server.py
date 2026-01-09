@@ -322,7 +322,8 @@ async def track_order(order_number: str):
 
 # Admin Auth Routes
 @api_router.post("/admin/login")
-async def admin_login(credentials: AdminLogin):
+@limiter.limit("5/minute")
+async def admin_login(request: Request, credentials: AdminLogin):
     admin = await db.admins.find_one({"username": credentials.username}, {"_id": 0})
     if not admin or not verify_password(credentials.password, admin['password_hash']):
         raise HTTPException(status_code=401, detail="Invalid credentials")
