@@ -52,6 +52,24 @@ export const AdminOrdersPage = () => {
     }
   };
 
+  const handleCreateShippingLabel = async (orderId) => {
+    if (!window.confirm('Create shipping label via Shiprocket? Make sure Shiprocket is configured.')) {
+      return;
+    }
+
+    setCreatingLabel(true);
+    try {
+      const response = await api.post(`/admin/shiprocket/create-order?order_id=${orderId}`);
+      toast.success('Shipping label created successfully!');
+      fetchOrders();
+    } catch (error) {
+      console.error('Failed to create shipping label:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create shipping label. Check if Shiprocket is configured.');
+    } finally {
+      setCreatingLabel(false);
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-gray-100 text-gray-800 border-gray-300';
