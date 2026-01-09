@@ -116,43 +116,46 @@ export const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="checkout-page">
       <div className="max-w-[1200px] mx-auto p-4 md:p-8">
-        <h1 className="text-4xl md:text-5xl font-syne font-bold tracking-tight mb-8" data-testid="checkout-title">
-          CHECKOUT
+        <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent" data-testid="checkout-title">
+          Checkout
         </h1>
+        <p className="text-gray-600 mb-8">Complete your order securely</p>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Form */}
           <form onSubmit={handleSubmit} className="md:col-span-2 space-y-6" data-testid="checkout-form">
             {/* Customer Details */}
-            <div className="bg-white border-2 border-black p-6">
-              <h2 className="font-syne font-bold text-xl mb-4">CUSTOMER DETAILS</h2>
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft">
+              <h2 className="font-display font-bold text-xl mb-6 text-gray-900">Customer Details</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-mono uppercase mb-2">Full Name *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
                   <input
                     type="text"
                     name="customer_name"
                     value={formData.customer_name}
                     onChange={handleInputChange}
                     required
-                    className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                     data-testid="customer-name-input"
+                    placeholder="Enter your full name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-mono uppercase mb-2">Email *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
                   <input
                     type="email"
                     name="customer_email"
                     value={formData.customer_email}
                     onChange={handleInputChange}
                     required
-                    className="w-full border-2 border-black p-3 focus:outline-none focus:shadow-brutalist transition-all"
+                    className="w-full border-2 border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent transition-all"
                     data-testid="customer-email-input"
+                    placeholder="your@email.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-mono uppercase mb-2">Phone *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Phone *</label>
                   <input
                     type="tel"
                     name="customer_phone"
