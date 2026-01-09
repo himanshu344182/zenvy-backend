@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 import api from '../utils/api';
+import { SEO } from '../components/SEO';
 
 export const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -20,6 +21,15 @@ export const HomePage = () => {
     };
     fetchProducts();
   }, []);
+
+  return (
+    <div data-testid="home-page">
+      <SEO 
+        title="ZENVY - Modern E-Commerce Store | Trendy Products Online"
+        description="Discover curated collections at ZENVY. Shop daily essentials, electronics, fashion, and trending products. Free shipping on orders over ₹999. Fast delivery across India."
+        keywords="online shopping India, ecommerce, buy electronics online, fashion store, home decor, daily essentials, trendy products, ZENVY store"
+        url="https://webstore-tracker.preview.emergentagent.com"
+      />
 
   return (
     <div data-testid="home-page">
