@@ -209,7 +209,7 @@ export const AdminOrdersPage = () => {
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => {
                       setSelectedOrder(order);
@@ -218,11 +218,29 @@ export const AdminOrdersPage = () => {
                         tracking_id: order.tracking_id || '' 
                       });
                     }}
-                    className="bg-brutalist-primary text-white font-bold py-2 px-6 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+                    className="flex items-center gap-2 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-2.5 px-5 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all"
                     data-testid={`update-order-status-btn-${order.id}`}
                   >
-                    UPDATE STATUS
+                    <Package className="w-4 h-4" />
+                    Update Status
                   </button>
+                  {order.payment_status === 'paid' && !order.shiprocket_order_id && (
+                    <button
+                      onClick={() => handleCreateShippingLabel(order.id)}
+                      disabled={creatingLabel}
+                      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all disabled:opacity-50"
+                      data-testid={`create-label-btn-${order.id}`}
+                    >
+                      <Truck className="w-4 h-4" />
+                      {creatingLabel ? 'Creating...' : 'Create Shipping Label'}
+                    </button>
+                  )}
+                  {order.shiprocket_order_id && (
+                    <div className="flex items-center gap-2 bg-green-100 text-green-800 font-semibold py-2.5 px-5 rounded-xl border-2 border-green-200">
+                      <Truck className="w-4 h-4" />
+                      Label Created
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
