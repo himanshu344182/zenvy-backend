@@ -58,30 +58,33 @@ export const CartDrawer = ({ isOpen, onClose }) => {
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-6" data-testid="cart-items-container">
           {cart.length === 0 ? (
-            <div className="text-center py-12" data-testid="cart-empty-message">
-              <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 font-manrope">Your cart is empty</p>
+            <div className="text-center py-16" data-testid="cart-empty-message">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <ShoppingCart className="w-10 h-10 text-gray-400" />
+              </div>
+              <p className="text-gray-500 font-medium">Your cart is empty</p>
+              <p className="text-sm text-gray-400 mt-2">Add some products to get started</p>
             </div>
           ) : (
             <div className="space-y-4">
               {cart.map((item) => (
                 <div 
                   key={item.product_id} 
-                  className="border-2 border-black p-4 bg-white"
+                  className="bg-gray-50 rounded-xl p-4 hover:shadow-medium transition-shadow"
                   data-testid={`cart-item-${item.product_id}`}
                 >
                   <div className="flex gap-4">
                     <img
                       src={item.image}
                       alt={item.product_name}
-                      className="w-20 h-20 object-cover border-2 border-black"
+                      className="w-20 h-20 object-cover rounded-lg"
                       data-testid={`cart-item-image-${item.product_id}`}
                     />
                     <div className="flex-1">
-                      <h3 className="font-bold font-manrope mb-2" data-testid={`cart-item-name-${item.product_id}`}>
+                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2" data-testid={`cart-item-name-${item.product_id}`}>
                         {item.product_name}
                       </h3>
-                      <p className="text-lg font-bold" data-testid={`cart-item-price-${item.product_id}`}>
+                      <p className="text-lg font-bold text-zenvy-primary" data-testid={`cart-item-price-${item.product_id}`}>
                         ₹{item.price.toFixed(2)}
                       </p>
                     </div>
@@ -91,17 +94,17 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleUpdateQuantity(item.product_id, item.quantity - 1)}
-                        className="p-2 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-zenvy-primary hover:text-zenvy-primary transition-colors"
                         data-testid={`cart-item-decrease-${item.product_id}`}
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="px-4 py-2 border-2 border-black font-bold font-mono" data-testid={`cart-item-quantity-${item.product_id}`}>
+                      <span className="px-4 py-1 text-sm font-bold text-gray-900" data-testid={`cart-item-quantity-${item.product_id}`}>
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => handleUpdateQuantity(item.product_id, item.quantity + 1)}
-                        className="p-2 border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-zenvy-primary hover:text-zenvy-primary transition-colors"
                         data-testid={`cart-item-increase-${item.product_id}`}
                       >
                         <Plus className="w-4 h-4" />
@@ -109,7 +112,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                     </div>
                     <button
                       onClick={() => handleRemove(item.product_id)}
-                      className="text-red-600 hover:text-red-800 font-bold"
+                      className="text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
                       data-testid={`cart-item-remove-${item.product_id}`}
                     >
                       Remove
