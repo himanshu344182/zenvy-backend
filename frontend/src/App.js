@@ -15,6 +15,7 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminPaymentsPage } from './pages/admin/AdminPaymentsPage';
+import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 
 function App() {
   return (
