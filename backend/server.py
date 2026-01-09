@@ -505,16 +505,26 @@ async def create_shiprocket_order(order_id: str, username: str = Depends(verify_
         raise HTTPException(status_code=404, detail="Order not found")
     
     try:
+        result = await create_shiprocket_shipment_internal(order)
+        return {"message": "Shiprocket order created", "data": result}
+    except Exception as e:
+        logging.error(f"Shiprocket error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def create_shiprocket_shipment_internal(order: dict):
+    """Internal function to create Shiprocket shipment"""
+    try:
         # Get Shiprocket auth token
         auth_response = requests.post(
             "https://apiv2.shiprocket.in/v1/external/auth/login",
-            json={"email": SHIPROCKET_EMAIL, "password": SHIPROCKET_PASSWORD}
+            json={"email": SHIPROCKET_EMAIL, "password": SHIPROCKET_PASSWORD},
+            timeout=30
         )
         auth_data = auth_response.json()
         token = auth_data.get('token')
         
         if not token:
-            raise HTTPException(status_code=500, detail="Shiprocket authentication failed")
+            raise Exception("Shiprocket authentication failed")
         
         # Create shipment
         shipment_data = {
@@ -550,7 +560,8 @@ async def create_shiprocket_order(order_id: str, username: str = Depends(verify_
         shipment_response = requests.post(
             "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
             headers={"Authorization": f"Bearer {token}"},
-            json=shipment_data
+            json=shipment_data,
+            timeout=30
         )
         
         shipment_result = shipment_response.json()
@@ -558,7 +569,7 @@ async def create_shiprocket_order(order_id: str, username: str = Depends(verify_
         if shipment_response.status_code == 200:
             # Update order with shiprocket details
             await db.orders.update_one(
-                {"id": order_id},
+                {"id": order['id']},
                 {
                     "$set": {
                         "shiprocket_order_id": shipment_result.get('order_id'),
@@ -567,13 +578,55 @@ async def create_shiprocket_order(order_id: str, username: str = Depends(verify_
                     }
                 }
             )
-            return {"message": "Shiprocket order created", "data": shipment_result}
+            return shipment_result
         else:
-            raise HTTPException(status_code=500, detail=shipment_result.get('message', 'Shiprocket order creation failed'))
+            raise Exception(shipment_result.get('message', 'Shiprocket order creation failed'))
             
     except Exception as e:
-        logging.error(f"Shiprocket error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Shiprocket internal error: {e}")
+        raise e
+
+@api_router.post("/webhooks/shiprocket")
+async def shiprocket_webhook(request: Request):
+    """Webhook endpoint for Shiprocket tracking updates"""
+    try:
+        payload = await request.json()
+        
+        # Extract tracking info
+        order_id = payload.get('order_id')
+        shipment_status = payload.get('current_status')
+        tracking_url = payload.get('track_url')
+        
+        if order_id:
+            # Update order with tracking info
+            update_data = {
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            # Map Shiprocket status to our order status
+            status_mapping = {
+                'SHIPPED': 'shipped',
+                'IN TRANSIT': 'shipped',
+                'OUT FOR DELIVERY': 'shipped',
+                'DELIVERED': 'delivered',
+                'RTO': 'cancelled',
+                'LOST': 'cancelled'
+            }
+            
+            if shipment_status in status_mapping:
+                update_data['order_status'] = status_mapping[shipment_status]
+            
+            await db.orders.update_one(
+                {"shiprocket_order_id": str(order_id)},
+                {"$set": update_data}
+            )
+            
+            logging.info(f"Webhook processed for order {order_id}: {shipment_status}")
+        
+        return {"status": "success"}
+    except Exception as e:
+        logging.error(f"Webhook error: {e}")
+        return {"status": "error", "message": str(e)}
 
 app.include_router(api_router)
 
