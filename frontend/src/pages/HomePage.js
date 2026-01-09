@@ -24,25 +24,31 @@ export const HomePage = () => {
   return (
     <div data-testid="home-page">
       {/* Hero Section */}
-      <section className="border-b-2 border-black" data-testid="hero-section">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid md:grid-cols-2 min-h-[70vh]">
+      <section className="relative overflow-hidden" data-testid="hero-section">
+        <div className="absolute inset-0 bg-gradient-to-br from-zenvy-primary/10 via-zenvy-secondary/10 to-transparent"></div>
+        <div className="max-w-[1400px] mx-auto relative">
+          <div className="grid md:grid-cols-2 min-h-[80vh] items-center">
             {/* Left: Typography */}
-            <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16 border-r-0 md:border-r-2 border-black">
-              <h1 className="text-6xl md:text-8xl font-syne font-bold tracking-tighter leading-none mb-6" data-testid="hero-title">
-                EVERYTHING
+            <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+              <div className="inline-block px-4 py-2 bg-zenvy-primary/10 text-zenvy-primary rounded-full text-sm font-semibold mb-6 w-fit">
+                ✨ New Arrivals Every Week
+              </div>
+              <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight mb-6" data-testid="hero-title">
+                Welcome to
                 <br />
-                <span className="text-brutalist-primary">STORE</span>
+                <span className="bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent">
+                  ZENVY
+                </span>
               </h1>
-              <p className="text-lg md:text-xl font-manrope mb-8 leading-relaxed max-w-md">
-                From daily essentials to Instagram-worthy finds. Everything you need, all in one place.
+              <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-md">
+                Discover curated collections of trending products. From daily essentials to Instagram-worthy finds.
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 bg-brutalist-primary text-white font-bold py-4 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 w-fit"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-4 px-8 rounded-full shadow-medium hover:shadow-large hover:scale-105 transition-all duration-200 w-fit"
                 data-testid="shop-now-btn"
               >
-                SHOP NOW
+                Shop Now
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
