@@ -33,14 +33,14 @@ export const CartDrawer = ({ isOpen, onClose }) => {
   const total = getCartTotal();
 
   return (
-    <>
+    <div className="fixed inset-0 z-50">
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40" 
+        className="absolute inset-0 bg-black bg-opacity-50" 
         onClick={onClose}
         data-testid="cart-overlay"
       />
       <div 
-        className="fixed right-0 top-0 h-full w-full md:w-[500px] bg-white border-l-2 border-black z-50 flex flex-col"
+        className="absolute right-0 top-0 h-full w-full md:w-[500px] bg-white border-l-2 border-black flex flex-col"
         data-testid="cart-drawer"
       >
         {/* Header */}
