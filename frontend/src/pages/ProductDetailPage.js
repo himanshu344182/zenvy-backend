@@ -51,12 +51,12 @@ export const ProductDetailPage = () => {
   const finalPrice = product.price * (1 - product.discount / 100);
 
   return (
-    <div className="min-h-screen" data-testid="product-detail-page">
+    <div className="min-h-screen bg-gray-50" data-testid="product-detail-page">
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12">
           {/* Images */}
           <div className="space-y-4" data-testid="product-images-section">
-            <div className="aspect-square border-2 border-black overflow-hidden">
+            <div className="aspect-square rounded-2xl overflow-hidden shadow-medium">
               <img
                 src={product.images[selectedImage]}
                 alt={product.name}
@@ -70,9 +70,9 @@ export const ProductDetailPage = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square border-2 overflow-hidden ${
-                      selectedImage === index ? 'border-brutalist-primary' : 'border-black'
-                    }`}
+                    className={`aspect-square rounded-xl overflow-hidden ${
+                      selectedImage === index ? 'ring-4 ring-zenvy-primary shadow-medium' : 'ring-2 ring-gray-200 hover:ring-gray-300'
+                    } transition-all`}
                     data-testid={`product-thumbnail-${index}`}
                   >
                     <img
@@ -89,19 +89,19 @@ export const ProductDetailPage = () => {
           {/* Details */}
           <div className="space-y-6" data-testid="product-details-section">
             <div>
-              <h1 className="text-4xl md:text-5xl font-syne font-bold tracking-tight mb-4" data-testid="product-title">
+              <h1 className="text-4xl md:text-5xl font-display font-bold mb-4" data-testid="product-title">
                 {product.name}
               </h1>
               <div className="flex items-center gap-4 flex-wrap">
-                <span className="text-4xl font-bold font-mono" data-testid="product-price-display">
+                <span className="text-4xl font-bold bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent" data-testid="product-price-display">
                   ₹{finalPrice.toFixed(2)}
                 </span>
                 {product.discount > 0 && (
                   <>
-                    <span className="text-xl text-gray-500 line-through" data-testid="product-original-price-display">
+                    <span className="text-xl text-gray-400 line-through" data-testid="product-original-price-display">
                       ₹{product.price.toFixed(2)}
                     </span>
-                    <span className="bg-brutalist-accent text-white px-3 py-1 text-sm font-bold" data-testid="product-discount-display">
+                    <span className="bg-gradient-to-r from-zenvy-accent to-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold" data-testid="product-discount-display">
                       {product.discount}% OFF
                     </span>
                   </>
