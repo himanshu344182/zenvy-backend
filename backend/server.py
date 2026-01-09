@@ -320,6 +320,27 @@ async def create_admin(admin_data: AdminCreate):
     
     return {"message": "Admin created successfully"}
 
+@api_router.post("/admin/change-password")
+async def change_password(
+    old_password: str = Form(...),
+    new_password: str = Form(...),
+    username: str = Depends(verify_token)
+):
+    admin = await db.admins.find_one({"username": username}, {"_id": 0})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    if not verify_password(old_password, admin['password_hash']):
+        raise HTTPException(status_code=401, detail="Invalid old password")
+    
+    new_hash = hash_password(new_password)
+    await db.admins.update_one(
+        {"username": username},
+        {"$set": {"password_hash": new_hash}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 # ============ ADMIN ROUTES (Protected) ============
 
 @api_router.get("/admin/products", response_model=List[Product])
