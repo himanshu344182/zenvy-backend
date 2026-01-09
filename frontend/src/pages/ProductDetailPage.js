@@ -168,9 +168,9 @@ export const ProductDetailPage = () => {
             </button>
 
             {/* Description */}
-            <div className="border-2 border-black p-6 bg-gray-50" data-testid="product-description">
-              <h3 className="font-syne font-bold text-xl mb-3">DESCRIPTION</h3>
-              <p className="font-manrope leading-relaxed whitespace-pre-wrap">{product.description}</p>
+            <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-soft" data-testid="product-description">
+              <h3 className="font-display font-bold text-xl mb-3 text-gray-900">Description</h3>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{product.description}</p>
             </div>
           </div>
         </div>
