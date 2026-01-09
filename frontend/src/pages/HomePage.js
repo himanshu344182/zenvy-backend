@@ -195,10 +195,10 @@ export const HomePage = () => {
           <div className="text-center mt-12">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 bg-black text-white font-bold py-4 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-4 px-8 rounded-full shadow-medium hover:shadow-large hover:scale-105 transition-all duration-200"
               data-testid="view-all-btn"
             >
-              VIEW ALL PRODUCTS
+              View All Products
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -206,23 +206,32 @@ export const HomePage = () => {
       </section>
 
       {/* Collections */}
-      <section className="py-12 md:py-20 px-4 md:px-8 bg-gray-50 border-t-2 border-b-2 border-black" data-testid="collections-section">
+      <section className="py-16 md:py-24 px-4 md:px-8 bg-white" data-testid="collections-section">
         <div className="max-w-[1400px] mx-auto">
-          <h2 className="text-4xl md:text-6xl font-syne font-bold tracking-tight mb-8 text-center">
-            SHOP BY VIBE
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-center mb-12 bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent">
+            Shop by Collection
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="border-2 border-black p-8 bg-white hover:shadow-brutalist transition-all cursor-pointer" data-testid="collection-home">
-              <h3 className="text-2xl font-syne font-bold mb-2">FOR HOME</h3>
-              <p className="font-manrope text-gray-600">Essentials that make your space yours</p>
+            <div className="group bg-gradient-to-br from-zenvy-primary/5 to-transparent rounded-2xl p-8 hover:shadow-large transition-all cursor-pointer hover:scale-105" data-testid="collection-home">
+              <div className="w-12 h-12 rounded-xl bg-zenvy-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl">🏠</span>
+              </div>
+              <h3 className="text-2xl font-display font-bold mb-2 text-gray-900">For Home</h3>
+              <p className="text-gray-600">Essentials that make your space yours</p>
             </div>
-            <div className="border-2 border-black p-8 bg-white hover:shadow-brutalist transition-all cursor-pointer" data-testid="collection-you">
-              <h3 className="text-2xl font-syne font-bold mb-2">FOR YOU</h3>
-              <p className="font-manrope text-gray-600">Daily must-haves and trending picks</p>
+            <div className="group bg-gradient-to-br from-zenvy-secondary/5 to-transparent rounded-2xl p-8 hover:shadow-large transition-all cursor-pointer hover:scale-105" data-testid="collection-you">
+              <div className="w-12 h-12 rounded-xl bg-zenvy-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl">✨</span>
+              </div>
+              <h3 className="text-2xl font-display font-bold mb-2 text-gray-900">For You</h3>
+              <p className="text-gray-600">Daily must-haves and trending picks</p>
             </div>
-            <div className="border-2 border-black p-8 bg-white hover:shadow-brutalist transition-all cursor-pointer" data-testid="collection-desk">
-              <h3 className="text-2xl font-syne font-bold mb-2">FOR DESK</h3>
-              <p className="font-manrope text-gray-600">Tech and gear to level up your setup</p>
+            <div className="group bg-gradient-to-br from-zenvy-accent/5 to-transparent rounded-2xl p-8 hover:shadow-large transition-all cursor-pointer hover:scale-105" data-testid="collection-desk">
+              <div className="w-12 h-12 rounded-xl bg-zenvy-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-2xl">💻</span>
+              </div>
+              <h3 className="text-2xl font-display font-bold mb-2 text-gray-900">For Desk</h3>
+              <p className="text-gray-600">Tech and gear to level up your setup</p>
             </div>
           </div>
         </div>
