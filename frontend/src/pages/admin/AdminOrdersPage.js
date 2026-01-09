@@ -10,6 +10,7 @@ export const AdminOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusUpdate, setStatusUpdate] = useState({ order_status: '', tracking_id: '' });
+  const [creatingLabel, setCreatingLabel] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
