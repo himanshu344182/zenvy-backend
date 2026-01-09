@@ -50,16 +50,19 @@ export const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="admin-dashboard-page">
       {/* Header */}
-      <div className="bg-white border-b-2 border-black">
+      <div className="bg-white border-b border-gray-200 shadow-soft">
         <div className="max-w-[1400px] mx-auto p-4 md:p-6 flex items-center justify-between">
-          <h1 className="text-3xl font-syne font-bold" data-testid="dashboard-title">ADMIN DASHBOARD</h1>
+          <div>
+            <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent" data-testid="dashboard-title">Admin Dashboard</h1>
+            <p className="text-sm text-gray-600 mt-1">Manage your ZENVY store</p>
+          </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-black text-white font-bold py-2 px-4 border-2 border-black hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-2 bg-gray-900 text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-gray-800 transition-colors shadow-soft"
             data-testid="logout-btn"
           >
             <LogOut className="w-4 h-4" />
-            LOGOUT
+            Logout
           </button>
         </div>
       </div>
@@ -67,36 +70,48 @@ export const AdminDashboardPage = () => {
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-testid="stats-grid">
-          <div className="bg-white border-2 border-black p-6" data-testid="stat-products">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft hover:shadow-medium transition-shadow" data-testid="stat-products">
             <div className="flex items-center justify-between mb-4">
-              <Package className="w-8 h-8 text-brutalist-primary" />
-              <span className="text-3xl font-bold font-mono">{stats?.total_products || 0}</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-zenvy-primary/10 to-zenvy-primary/20 flex items-center justify-center">
+                <Package className="w-6 h-6 text-zenvy-primary" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats?.total_products || 0}</span>
             </div>
-            <p className="font-manrope font-bold">Total Products</p>
+            <p className="font-semibold text-gray-700">Total Products</p>
+            <p className="text-xs text-gray-500 mt-1">Active inventory items</p>
           </div>
 
-          <div className="bg-white border-2 border-black p-6" data-testid="stat-orders">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft hover:shadow-medium transition-shadow" data-testid="stat-orders">
             <div className="flex items-center justify-between mb-4">
-              <ShoppingBag className="w-8 h-8 text-brutalist-primary" />
-              <span className="text-3xl font-bold font-mono">{stats?.total_orders || 0}</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/20 flex items-center justify-center">
+                <ShoppingBag className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats?.total_orders || 0}</span>
             </div>
-            <p className="font-manrope font-bold">Total Orders</p>
+            <p className="font-semibold text-gray-700">Total Orders</p>
+            <p className="text-xs text-gray-500 mt-1">All time orders</p>
           </div>
 
-          <div className="bg-white border-2 border-black p-6" data-testid="stat-pending">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft hover:shadow-medium transition-shadow" data-testid="stat-pending">
             <div className="flex items-center justify-between mb-4">
-              <Clock className="w-8 h-8 text-yellow-600" />
-              <span className="text-3xl font-bold font-mono">{stats?.pending_orders || 0}</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-500/20 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-amber-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">{stats?.pending_orders || 0}</span>
             </div>
-            <p className="font-manrope font-bold">Pending Orders</p>
+            <p className="font-semibold text-gray-700">Pending Orders</p>
+            <p className="text-xs text-gray-500 mt-1">Needs attention</p>
           </div>
 
-          <div className="bg-white border-2 border-black p-6" data-testid="stat-revenue">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft hover:shadow-medium transition-shadow" data-testid="stat-revenue">
             <div className="flex items-center justify-between mb-4">
-              <DollarSign className="w-8 h-8 text-green-600" />
-              <span className="text-3xl font-bold font-mono">₹{stats?.total_revenue?.toFixed(0) || 0}</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/20 flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-green-600" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900">₹{stats?.total_revenue?.toFixed(0) || 0}</span>
             </div>
-            <p className="font-manrope font-bold">Total Revenue</p>
+            <p className="font-semibold text-gray-700">Total Revenue</p>
+            <p className="text-xs text-gray-500 mt-1">From paid orders</p>
           </div>
         </div>
 
