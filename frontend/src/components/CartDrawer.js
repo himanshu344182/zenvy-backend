@@ -126,17 +126,17 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         {cart.length > 0 && (
-          <div className="p-6 border-t-2 border-black bg-gray-50">
+          <div className="p-6 border-t border-gray-200 bg-white">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-xl font-bold font-syne">TOTAL</span>
-              <span className="text-2xl font-bold font-mono" data-testid="cart-total">₹{total.toFixed(2)}</span>
+              <span className="text-lg font-semibold text-gray-700">Total</span>
+              <span className="text-2xl font-bold text-gray-900" data-testid="cart-total">₹{total.toFixed(2)}</span>
             </div>
             <button
               onClick={handleCheckout}
-              className="w-full bg-brutalist-primary text-white font-bold py-4 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200"
+              className="w-full bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-4 px-8 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all duration-200"
               data-testid="cart-checkout-btn"
             >
-              CHECKOUT
+              Proceed to Checkout
             </button>
           </div>
         )}
