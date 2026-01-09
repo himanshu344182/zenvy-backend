@@ -138,6 +138,6 @@ export const CartDrawer = ({ isOpen, onClose }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
