@@ -110,16 +110,16 @@ export const ProductDetailPage = () => {
             </div>
 
             {/* Stock Status */}
-            <div className="border-2 border-black p-4 bg-white">
+            <div className="rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 p-4">
               {product.stock > 0 ? (
-                <div className="flex items-center gap-2 text-green-600" data-testid="stock-available">
+                <div className="flex items-center gap-2 text-green-700" data-testid="stock-available">
                   <Check className="w-5 h-5" />
-                  <span className="font-bold font-mono">IN STOCK - {product.stock} available</span>
+                  <span className="font-semibold">In Stock - {product.stock} available</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-red-600" data-testid="stock-unavailable">
                   <AlertCircle className="w-5 h-5" />
-                  <span className="font-bold font-mono">OUT OF STOCK</span>
+                  <span className="font-semibold">Out of Stock</span>
                 </div>
               )}
             </div>
@@ -127,11 +127,11 @@ export const ProductDetailPage = () => {
             {/* Quantity Selector */}
             {product.stock > 0 && (
               <div className="space-y-2">
-                <label className="block text-sm font-mono uppercase">Quantity</label>
-                <div className="flex items-center gap-2">
+                <label className="block text-sm font-semibold text-gray-700">Quantity</label>
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 py-2 border-2 border-black font-bold hover:bg-black hover:text-white transition-colors"
+                    className="w-10 h-10 rounded-full border-2 border-gray-300 font-bold hover:border-zenvy-primary hover:text-zenvy-primary transition-colors flex items-center justify-center"
                     data-testid="quantity-decrease-btn"
                   >
                     -
@@ -142,12 +142,12 @@ export const ProductDetailPage = () => {
                     max={product.stock}
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
-                    className="w-20 px-4 py-2 border-2 border-black text-center font-mono font-bold focus:outline-none focus:shadow-brutalist"
+                    className="w-20 px-4 py-2 border-2 border-gray-300 rounded-lg text-center font-bold focus:outline-none focus:ring-2 focus:ring-zenvy-primary focus:border-transparent"
                     data-testid="quantity-input"
                   />
                   <button
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    className="px-4 py-2 border-2 border-black font-bold hover:bg-black hover:text-white transition-colors"
+                    className="w-10 h-10 rounded-full border-2 border-gray-300 font-bold hover:border-zenvy-primary hover:text-zenvy-primary transition-colors flex items-center justify-center"
                     data-testid="quantity-increase-btn"
                   >
                     +
@@ -160,11 +160,11 @@ export const ProductDetailPage = () => {
             <button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
-              className="w-full bg-brutalist-primary text-white font-bold py-4 px-8 border-2 border-black shadow-brutalist hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-zenvy-primary to-zenvy-secondary text-white font-bold py-4 px-8 rounded-xl shadow-medium hover:shadow-large hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-lg"
               data-testid="add-to-cart-btn"
             >
               <ShoppingCart className="w-5 h-5" />
-              {product.stock > 0 ? 'ADD TO CART' : 'OUT OF STOCK'}
+              {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
             </button>
 
             {/* Description */}
