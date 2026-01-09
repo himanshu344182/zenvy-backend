@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Package } from 'lucide-react';
+import { ArrowLeft, Package, Truck } from 'lucide-react';
 import api from '../../utils/api';
 import { toast } from 'sonner';
 
