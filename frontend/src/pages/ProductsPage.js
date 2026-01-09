@@ -48,6 +48,12 @@ export const ProductsPage = () => {
 
   return (
     <div className="min-h-screen" data-testid="products-page">
+      <SEO 
+        title={searchQuery ? `Search: ${searchQuery} - ZENVY` : "All Products - ZENVY | Shop Online"}
+        description={searchQuery ? `Search results for ${searchQuery} at ZENVY` : "Browse all products at ZENVY. Find electronics, fashion, home essentials and more. Best prices with free shipping over ₹999."}
+        keywords="shop online, buy products, electronics, fashion, home decor, daily essentials"
+        url={`https://webstore-tracker.preview.emergentagent.com/products${searchQuery ? `?search=${searchQuery}` : ''}`}
+      />
       <div className="max-w-[1400px] mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="mb-8">
