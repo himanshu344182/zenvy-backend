@@ -245,37 +245,37 @@ export const CheckoutPage = () => {
 
           {/* Order Summary */}
           <div className="md:col-span-1">
-            <div className="bg-white border-2 border-black p-6 sticky top-24" data-testid="order-summary">
-              <h2 className="font-syne font-bold text-xl mb-4">ORDER SUMMARY</h2>
-              <div className="space-y-3 mb-6">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-soft sticky top-24" data-testid="order-summary">
+              <h2 className="font-display font-bold text-xl mb-6 text-gray-900">Order Summary</h2>
+              <div className="space-y-4 mb-6">
                 {cart.map((item) => (
-                  <div key={item.product_id} className="flex gap-3 pb-3 border-b border-gray-200" data-testid={`summary-item-${item.product_id}`}>
+                  <div key={item.product_id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0" data-testid={`summary-item-${item.product_id}`}>
                     <img
                       src={item.image}
                       alt={item.product_name}
-                      className="w-16 h-16 object-cover border border-gray-300"
+                      className="w-16 h-16 object-cover rounded-lg border border-gray-200"
                     />
                     <div className="flex-1">
-                      <p className="font-bold text-sm line-clamp-2">{item.product_name}</p>
+                      <p className="font-semibold text-sm line-clamp-2 text-gray-900">{item.product_name}</p>
                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                      <p className="font-bold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold text-zenvy-primary">₹{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between">
-                  <span className="font-manrope">Subtotal</span>
-                  <span className="font-bold font-mono" data-testid="summary-subtotal">₹{subtotal.toFixed(2)}</span>
+              <div className="space-y-3 mb-6 pt-4 border-t-2 border-gray-200">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span className="font-semibold" data-testid="summary-subtotal">₹{subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-manrope">Shipping</span>
-                  <span className="font-bold font-mono text-green-600">FREE</span>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span className="font-semibold text-green-600">FREE</span>
                 </div>
-                <div className="border-t-2 border-black pt-2 mt-2">
+                <div className="pt-3 border-t border-gray-200">
                   <div className="flex justify-between items-center">
-                    <span className="font-syne font-bold text-xl">TOTAL</span>
-                    <span className="font-bold font-mono text-2xl" data-testid="summary-total">₹{subtotal.toFixed(2)}</span>
+                    <span className="font-display font-bold text-lg text-gray-900">Total</span>
+                    <span className="font-bold text-2xl bg-gradient-to-r from-zenvy-primary to-zenvy-secondary bg-clip-text text-transparent" data-testid="summary-total">₹{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
