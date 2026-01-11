@@ -4,6 +4,7 @@ motor
 pymongo[srv]
 python-dotenv
 bcrypt
+PyJWT
 python-jose
 slowapi
 requests
