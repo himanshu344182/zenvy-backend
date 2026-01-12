@@ -252,7 +252,7 @@ async def create_order(order_data: OrderCreate):
                 "amount": amount_in_paise,
                 "currency": "INR",
                 "receipt": order.order_number,
-                "payment_capture": 1
+                "payment_capture": 0
             })
             order.razorpay_order_id = razorpay_order['id']
         except Exception as e:
@@ -272,6 +272,16 @@ async def verify_payment(payment_data: PaymentVerification):
     
     try:
         razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+
+         # 🔍 DEBUG LOGS (ADD HERE)
+        print("---- RAZORPAY VERIFY ----")
+        print("ORDER ID:", payment_data.razorpay_order_id)
+        print("PAYMENT ID:", payment_data.razorpay_payment_id)
+        print("SIGNATURE:", payment_data.razorpay_signature)
+        print("KEY ID:", RAZORPAY_KEY_ID)
+        print("SECRET PRESENT:", bool(RAZORPAY_KEY_SECRET))
+        print("--------------------------")
+        
         razorpay_client.utility.verify_payment_signature({
             'razorpay_order_id': payment_data.razorpay_order_id,
             'razorpay_payment_id': payment_data.razorpay_payment_id,
