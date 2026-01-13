@@ -11,3 +11,4 @@ requests
 razorpay
 email-validator
 python-multipart
+jinja2

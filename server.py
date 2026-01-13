@@ -19,6 +19,8 @@ import razorpay
 import requests
 from decimal import Decimal
 import re
+import smtplib
+from email.message import EmailMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -40,6 +42,14 @@ RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
 # Shiprocket Configuration (will be set by user later)
 SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL', '')
 SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
+
+# SMTP Configuration (Zoho)
+SMTP_HOST = os.environ.get("SMTP_HOST")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+SMTP_FROM_EMAIL = os.environ.get("SMTP_FROM_EMAIL")
+SMTP_FROM_NAME = os.environ.get("SMTP_FROM_NAME", "ZENVY")
 
 app = FastAPI()
 
@@ -195,6 +205,62 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
+def send_email(to_email: str, subject: str, html_content: str):
+    if not all([SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM_EMAIL]):
+        logging.warning("SMTP not fully configured, email skipped")
+        return
+
+    msg = EmailMessage()
+    msg["From"] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.set_content("This email requires HTML support.")
+    msg.add_alternative(html_content, subtype="html")
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
+            logging.info(f"Email sent to {to_email}")
+    except Exception as e:
+        logging.error(f"Email sending failed: {e}")
+
+def order_confirmation_email(order: dict) -> str:
+    items_html = ""
+    for item in order["items"]:
+        items_html += f"""
+        <tr>
+            <td>{item['product_name']}</td>
+            <td>{item['quantity']}</td>
+            <td>₹{item['price']}</td>
+        </tr>
+        """
+
+    return f"""
+    <html>
+    <body style="font-family: Arial, sans-serif;">
+        <h2>Thank you for your order, {order['customer_name']}!</h2>
+        <p><strong>Order Number:</strong> {order['order_number']}</p>
+
+        <table border="1" cellpadding="8" cellspacing="0">
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+            </tr>
+            {items_html}
+        </table>
+
+        <p><strong>Total:</strong> ₹{order['total']}</p>
+
+        <p>We’ll notify you when your order is shipped.</p>
+
+        <p>— Team ZENVY</p>
+    </body>
+    </html>
+    """
+
 # ============ PUBLIC ROUTES ============
 
 @api_router.get("/")
@@ -273,7 +339,7 @@ async def verify_payment(payment_data: PaymentVerification):
     try:
         razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
-         # 🔍 DEBUG LOGS (ADD HERE)
+        # 🔍 DEBUG LOGS (ADD HERE)
         print("---- RAZORPAY VERIFY ----")
         print("ORDER ID:", payment_data.razorpay_order_id)
         print("PAYMENT ID:", payment_data.razorpay_payment_id)
@@ -305,6 +371,16 @@ async def verify_payment(payment_data: PaymentVerification):
         # Reduce stock for each item
         order = await db.orders.find_one({"razorpay_order_id": payment_data.razorpay_order_id}, {"_id": 0})
         if order:
+            # 📧 Send order confirmation email
+            try:
+                email_html = order_confirmation_email(order)
+                send_email(
+                    to_email=order["customer_email"],
+                    subject=f"Order Confirmed - {order['order_number']}",
+                    html_content=email_html
+                )
+            except Exception as e:
+                logging.error(f"Order email failed: {e}")
             for item in order['items']:
                 await db.products.update_one(
                     {"id": item['product_id']},
