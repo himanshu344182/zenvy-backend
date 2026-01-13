@@ -204,7 +204,7 @@ def verify_password(password: str, hashed: str) -> bool:
 
 def send_email(to_email: str, subject: str, html_content: str):
     try:
-        # 1️⃣ Get access token
+        # 1️⃣ Get access token using refresh token
         token_res = requests.post(
             "https://accounts.zoho.in/oauth/v2/token",
             data={
@@ -222,9 +222,9 @@ def send_email(to_email: str, subject: str, html_content: str):
         if not access_token:
             raise Exception(f"Zoho token error: {token_data}")
 
-        # 2️⃣ Send email
+        # 2️⃣ Send email (CORRECT URL)
         send_res = requests.post(
-            "https://mail.zoho.in/api/accounts/me/messages",
+            "https://mail.zoho.in/api/accounts/2465440000000002002/messages",
             headers={
                 "Authorization": f"Zoho-oauthtoken {access_token}",
                 "Content-Type": "application/json",
