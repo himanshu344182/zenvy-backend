@@ -20,8 +20,6 @@ import razorpay
 import requests
 from decimal import Decimal
 import re
-import smtplib
-from email.message import EmailMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -44,13 +42,11 @@ RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
 SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL', '')
 SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
 
-# SMTP Configuration (Zoho)
-SMTP_HOST = os.environ.get("SMTP_HOST")
-SMTP_PORT = int(os.environ.get("SMTP_PORT", 465))
-SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
-SMTP_FROM_EMAIL = os.environ.get("SMTP_FROM_EMAIL")
-SMTP_FROM_NAME = os.environ.get("SMTP_FROM_NAME", "ZENVY")
+# Zoho OAuth Mail Configuration
+ZOHO_CLIENT_ID = os.environ.get("ZOHO_CLIENT_ID")
+ZOHO_CLIENT_SECRET = os.environ.get("ZOHO_CLIENT_SECRET")
+ZOHO_REFRESH_TOKEN = os.environ.get("ZOHO_REFRESH_TOKEN")
+ZOHO_ACCOUNT_EMAIL = os.environ.get("ZOHO_ACCOUNT_EMAIL")
 
 app = FastAPI()
 
@@ -207,24 +203,49 @@ def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 def send_email(to_email: str, subject: str, html_content: str):
-    if not all([SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM_EMAIL]):
-        logging.warning("SMTP not fully configured, email skipped")
-        return
-
-    msg = EmailMessage()
-    msg["From"] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
-    msg["To"] = to_email
-    msg["Subject"] = subject
-    msg.set_content("This email requires HTML support.")
-    msg.add_alternative(html_content, subtype="html")
-
     try:
-        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10) as server:
-            server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.send_message(msg)
-            logging.info(f"Email sent to {to_email}")
+        # 1️⃣ Get access token
+        token_res = requests.post(
+            "https://accounts.zoho.in/oauth/v2/token",
+            data={
+                "refresh_token": ZOHO_REFRESH_TOKEN,
+                "client_id": ZOHO_CLIENT_ID,
+                "client_secret": ZOHO_CLIENT_SECRET,
+                "grant_type": "refresh_token",
+            },
+            timeout=10,
+        )
+
+        token_data = token_res.json()
+        access_token = token_data.get("access_token")
+
+        if not access_token:
+            raise Exception(f"Zoho token error: {token_data}")
+
+        # 2️⃣ Send email
+        send_res = requests.post(
+            "https://mail.zoho.in/api/accounts/me/messages",
+            headers={
+                "Authorization": f"Zoho-oauthtoken {access_token}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "fromAddress": ZOHO_ACCOUNT_EMAIL,
+                "toAddress": to_email,
+                "subject": subject,
+                "content": html_content,
+                "mailFormat": "html",
+            },
+            timeout=10,
+        )
+
+        if send_res.status_code not in (200, 201):
+            raise Exception(send_res.text)
+
+        logging.info(f"Zoho email sent to {to_email}")
+
     except Exception as e:
-        logging.error(f"Email sending failed: {e}")
+        logging.error(f"Zoho email failed: {e}")
 
 def order_confirmation_email(order: dict) -> str:
     items_html = ""
