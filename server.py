@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from fastapi import BackgroundTasks
 import os
 import logging
 from pathlib import Path
@@ -332,7 +333,10 @@ async def create_order(order_data: OrderCreate):
     return order
 
 @api_router.post("/orders/verify-payment")
-async def verify_payment(payment_data: PaymentVerification):
+async def verify_payment(
+    payment_data: PaymentVerification,
+    background_tasks: BackgroundTasks
+):
     if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
         raise HTTPException(status_code=400, detail="Razorpay not configured")
     
@@ -373,11 +377,11 @@ async def verify_payment(payment_data: PaymentVerification):
         if order:
             # 📧 Send order confirmation email
             try:
-                email_html = order_confirmation_email(order)
-                send_email(
-                    to_email=order["customer_email"],
-                    subject=f"Order Confirmed - {order['order_number']}",
-                    html_content=email_html
+                background_tasks.add_task(
+                    send_email,
+                    order["customer_email"],
+                    f"Order Confirmed - {order['order_number']}",
+                    order_confirmation_email(order)
                 )
             except Exception as e:
                 logging.error(f"Order email failed: {e}")
