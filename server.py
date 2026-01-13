@@ -339,7 +339,7 @@ async def create_order(order_data: OrderCreate):
                 "amount": amount_in_paise,
                 "currency": "INR",
                 "receipt": order.order_number,
-                "payment_capture": 0
+                "payment_capture": 1
             })
             order.razorpay_order_id = razorpay_order['id']
         except Exception as e:
