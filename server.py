@@ -46,7 +46,7 @@ SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
 
 # SMTP Configuration (Zoho)
 SMTP_HOST = os.environ.get("SMTP_HOST")
-SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+SMTP_PORT = int(os.environ.get("SMTP_PORT", 465))
 SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
 SMTP_FROM_EMAIL = os.environ.get("SMTP_FROM_EMAIL")
@@ -219,8 +219,7 @@ def send_email(to_email: str, subject: str, html_content: str):
     msg.add_alternative(html_content, subtype="html")
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.starttls()
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10) as server:
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
             server.send_message(msg)
             logging.info(f"Email sent to {to_email}")
