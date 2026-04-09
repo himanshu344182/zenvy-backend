@@ -16,9 +16,8 @@ function createTransporter() {
 
   return nodemailer.createTransport({
     host: 'smtp.zoho.in',
-    port: 587,
-    secure: false, // false for port 587
-    requireTLS: true,
+    port: 465,
+    secure: true, // true for port 465
     auth: {
       type: 'OAuth2',
       user: ZOHO_ACCOUNT_EMAIL,
@@ -27,7 +26,7 @@ function createTransporter() {
       refreshToken: ZOHO_REFRESH_TOKEN,
       accessUrl: 'https://accounts.zoho.in/oauth/v2/token'
     },
-    connectionTimeout: 10000, // 10 seconds
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000
   });
@@ -35,7 +34,6 @@ function createTransporter() {
 
 /**
  * Send an order confirmation email to the customer.
- * Silently fails if Zoho is not configured.
  */
 async function sendOrderConfirmationEmail(order) {
   const transporter = createTransporter();
