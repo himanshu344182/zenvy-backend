@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { getCart, getCartTotal, clearCart } from '../utils/cart';
 import api from '../utils/api';
 import { toast } from 'sonner';
-import { useRazorpay } from 'react-razorpay';
+// import { useRazorpay } from 'react-razorpay';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const Razorpay = useRazorpay();
+  // const Razorpay = useRazorpay();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
   
@@ -39,27 +39,47 @@ export const CheckoutPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log(
+      "Razorpay key from env:",
+      process.env.REACT_APP_RAZORPAY_KEY_ID
+      );
+
     setLoading(true);
 
     try {
       const subtotal = getCartTotal();
       const orderData = {
         ...formData,
-        items: cart,
-        subtotal: subtotal,
-        total: subtotal
+        items: cart.map(item => ({
+          product_id: item.product_id || item.id,
+          product_name: item.product_name || item.name,
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+          image: item.image || item.images?.[0]
+        })),
+        subtotal: Number(subtotal),
+        total: Number(subtotal)
       };
+
 
       // Create order
       const response = await api.post('/orders', orderData);
       const order = response.data;
 
       // Check if Razorpay is configured
+      // if (!order.razorpay_order_id) {
+      //   toast.error('Payment gateway not configured. Please contact admin.');
+      //   setLoading(false);
+      //   return;
+      // }
       if (!order.razorpay_order_id) {
-        toast.error('Payment gateway not configured. Please contact admin.');
-        setLoading(false);
-        return;
-      }
+         toast.success('Order placed successfully');
+         clearCart();
+         navigate(`/order-confirmation/${order.order_number}`);
+         return;
+          }
+
 
       // Initialize Razorpay payment
       const options = {
@@ -102,7 +122,8 @@ export const CheckoutPage = () => {
         }
       };
 
-      const razorpayInstance = new Razorpay(options);
+      // const razorpayInstance = new Razorpay(options);
+      const razorpayInstance = new window.Razorpay(options);
       razorpayInstance.open();
     } catch (error) {
       console.error('Order creation failed:', error);

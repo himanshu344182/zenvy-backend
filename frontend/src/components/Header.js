@@ -25,15 +25,15 @@ export const Header = () => {
           <div className="border-b border-gray-100 py-2 px-4 bg-gradient-to-r from-zenvy-primary/5 to-zenvy-secondary/5">
             <div className="flex items-center justify-between">
               <div className="text-xs font-medium text-gray-600">
-                ✨ Free shipping on orders over ₹999
+                ✨ Free shipping on all orders 🔥
               </div>
               <Link 
-                to="/admin" 
+                to="/track-order" 
                 className="text-xs font-medium text-gray-600 hover:text-zenvy-primary transition-colors flex items-center gap-1"
                 data-testid="admin-link"
               >
                 <User className="w-3.5 h-3.5" />
-                Admin
+                Track Your Order
               </Link>
             </div>
           </div>

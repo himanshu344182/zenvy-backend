@@ -446,10 +446,18 @@ async def admin_delete_product(product_id: str, username: str = Depends(verify_t
 async def admin_get_orders(username: str = Depends(verify_token)):
     orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     for order in orders:
-        if isinstance(order.get('created_at'), str):
-            order['created_at'] = datetime.fromisoformat(order['created_at'])
-        if isinstance(order.get('updated_at'), str):
-            order['updated_at'] = datetime.fromisoformat(order['updated_at'])
+        if isinstance(order.get("created_at"), str):
+            order["created_at"] = datetime.fromisoformat(order["created_at"])
+
+        if isinstance(order.get("updated_at"), str):
+            order["updated_at"] = datetime.fromisoformat(order["updated_at"])
+
+        # 🔥 FIX FOR SHIPROCKET NUMERIC IDS
+        if order.get("tracking_id") is not None:
+            order["tracking_id"] = str(order["tracking_id"])
+
+        if order.get("shiprocket_order_id") is not None:
+            order["shiprocket_order_id"] = str(order["shiprocket_order_id"])
     return orders
 
 @api_router.put("/admin/orders/{order_id}")
@@ -512,79 +520,101 @@ async def create_shiprocket_order(order_id: str, username: str = Depends(verify_
         raise HTTPException(status_code=500, detail=str(e))
 
 async def create_shiprocket_shipment_internal(order: dict):
-    """Internal function to create Shiprocket shipment"""
     try:
-        # Get Shiprocket auth token
+        # 1️⃣ Authenticate
         auth_response = requests.post(
             "https://apiv2.shiprocket.in/v1/external/auth/login",
-            json={"email": SHIPROCKET_EMAIL, "password": SHIPROCKET_PASSWORD},
+            json={
+                "email": SHIPROCKET_EMAIL,
+                "password": SHIPROCKET_PASSWORD
+            },
             timeout=30
         )
+
         auth_data = auth_response.json()
-        token = auth_data.get('token')
-        
+        token = auth_data.get("token")
+
         if not token:
-            raise Exception("Shiprocket authentication failed")
-        
-        # Create shipment
+            raise Exception(f"Shiprocket auth failed: {auth_data}")
+
+        # 2️⃣ Prepare shipment payload (Shiprocket strict format)
+        # Split name safely
+        full_name = order["customer_name"].strip()
+        name_parts = full_name.split(" ", 1)
+
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else "Customer"
+
         shipment_data = {
-            "order_id": order['order_number'],
-            "order_date": order['created_at'],
+            "order_id": order["order_number"],
+            "order_date": order["created_at"][:10],
             "pickup_location": "Primary",
-            "billing_customer_name": order['customer_name'],
-            "billing_address": order['shipping_address'],
-            "billing_city": order['shipping_city'],
-            "billing_pincode": order['shipping_pincode'],
-            "billing_state": order['shipping_state'],
+
+            "billing_customer_name": full_name,
+            "billing_first_name": first_name,
+            "billing_last_name": last_name,
+
+            "billing_address": order["shipping_address"],
+            "billing_city": order["shipping_city"],
+            "billing_pincode": str(order["shipping_pincode"]),
+            "billing_state": order["shipping_state"],
             "billing_country": "India",
-            "billing_email": order['customer_email'],
-            "billing_phone": order['customer_phone'],
+            "billing_email": order["customer_email"],
+            "billing_phone": str(order["customer_phone"]),
+
             "shipping_is_billing": True,
             "order_items": [
                 {
-                    "name": item['product_name'],
-                    "sku": item['product_id'],
-                    "units": item['quantity'],
-                    "selling_price": item['price']
+                    "name": item["product_name"],
+                    "sku": str(item["product_id"]),
+                    "units": int(item["quantity"]),
+                    "selling_price": float(item["price"])
                 }
-                for item in order['items']
+                for item in order["items"]
             ],
             "payment_method": "Prepaid",
-            "sub_total": order['subtotal'],
+            "sub_total": float(order["subtotal"]),
             "length": 10,
             "breadth": 10,
             "height": 10,
             "weight": 0.5
         }
-        
+
+
+        # 3️⃣ Create shipment
         shipment_response = requests.post(
             "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc",
-            headers={"Authorization": f"Bearer {token}"},
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
             json=shipment_data,
             timeout=30
         )
-        
+
         shipment_result = shipment_response.json()
-        
-        if shipment_response.status_code == 200:
-            # Update order with shiprocket details
-            await db.orders.update_one(
-                {"id": order['id']},
-                {
-                    "$set": {
-                        "shiprocket_order_id": shipment_result.get('order_id'),
-                        "tracking_id": shipment_result.get('shipment_id'),
-                        "updated_at": datetime.now(timezone.utc).isoformat()
-                    }
+
+        if shipment_response.status_code != 200:
+            raise Exception(shipment_result)
+
+        # 4️⃣ Save Shiprocket IDs
+        await db.orders.update_one(
+            {"id": order["id"]},
+            {
+                "$set": {
+                    "shiprocket_order_id": str(shipment_result.get("order_id")),
+                    "tracking_id": str(shipment_result.get("shipment_id")),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
                 }
-            )
-            return shipment_result
-        else:
-            raise Exception(shipment_result.get('message', 'Shiprocket order creation failed'))
-            
+            }
+        )
+
+        return shipment_result
+
     except Exception as e:
-        logging.error(f"Shiprocket internal error: {e}")
-        raise e
+        logging.error(f"Shiprocket error: {e}")
+        raise
+
 
 @api_router.post("/webhooks/shiprocket")
 async def shiprocket_webhook(request: Request):

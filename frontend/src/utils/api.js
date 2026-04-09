@@ -1,17 +1,14 @@
-import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: "http://localhost:8000/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Add auth token to requests if available
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
+  const token = localStorage.getItem("admin_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
