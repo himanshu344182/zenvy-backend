@@ -15,16 +15,17 @@ function createTransporter() {
   }
 
   return nodemailer.createTransport({
-    host: 'smtp.zoho.com', // Changed from .in to .com
-    port: 465,
-    secure: true,
+    host: 'smtp.zoho.in',
+    port: 587,
+    secure: false, // false for port 587
+    requireTLS: true,
     auth: {
       type: 'OAuth2',
       user: ZOHO_ACCOUNT_EMAIL,
       clientId: ZOHO_CLIENT_ID,
       clientSecret: ZOHO_CLIENT_SECRET,
       refreshToken: ZOHO_REFRESH_TOKEN,
-      accessUrl: 'https://accounts.zoho.com/oauth/v2/token' // Changed from .in to .com
+      accessUrl: 'https://accounts.zoho.in/oauth/v2/token'
     },
     connectionTimeout: 10000, // 10 seconds
     greetingTimeout: 10000,
