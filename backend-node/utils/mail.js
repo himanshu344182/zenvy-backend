@@ -15,7 +15,7 @@ function createTransporter() {
   }
 
   return nodemailer.createTransport({
-    host: 'smtp.zoho.in',
+    host: 'smtp.zoho.com', // Changed from .in to .com
     port: 465,
     secure: true,
     auth: {
@@ -24,8 +24,11 @@ function createTransporter() {
       clientId: ZOHO_CLIENT_ID,
       clientSecret: ZOHO_CLIENT_SECRET,
       refreshToken: ZOHO_REFRESH_TOKEN,
-      accessUrl: 'https://accounts.zoho.in/oauth/v2/token'
-    }
+      accessUrl: 'https://accounts.zoho.com/oauth/v2/token' // Changed from .in to .com
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000
   });
 }
 
