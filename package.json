@@ -1,0 +1,12 @@
+{
+  "name": "zenvy-root",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "cd backend-node && node server.js",
+    "build": "cd backend-node && npm install"
+  }
+}
